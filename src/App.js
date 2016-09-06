@@ -1,40 +1,49 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const API_KEY = '4aa883f95999ec813b8bfaf319f3972b';
-
-function  fetchData(value){
-  return fetch(`http://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${value}`)
-  .then(response=>{
-    return response.json();
-  }).then(data=>{
-    return data.results;
-  })
+/*
+function fetchData(value) {
+  return fetch('http://www.passwordrandom.com/query?command=password&format=json&count=1')
+    .then(response => {
+      return response.json();
+    }).then(data => {
+      console.log(data);
+      return data.results;
+    })
 }
-
+*/
 class App extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
-      search: '',
-      movies : [],
-      isFetching : false
+      password: '',
+      isFetching: false,
+      score: 0
     }
 
-  } 
-  change(e){
-    const value = e.target.value;  
-    let state  = this.state;
-    state.search = value;
-  
-    if(value.length > 3){
-      state.isFetching = true;
-      fetchData(value).then((movies)=>{
-        state.isFetching=false;
-        state.movies=movies;
-        this.setState(state);
-      });
+  }
+  change(e) {
+    const value = e.target.value;
+    let state = this.state;
+    state.password = value;
+    if (value.length > 4) {
+      state.score = 20;
+      if (value.match(/[a-z]/)) {
+        state.score += 20;
+      }
+      if (value.match(/[A-Z]/)) {
+        state.score += 20;
+      }
+      if(value.match(/(?=.*?[#?!@$%^&*-.,+-_)(])/)){
+        state.score+=20;
+      }
+      if(value.length>10){
+        state.score+=20;
+      }
+    }
+    if (value.length < 4) {
+      state.score = 0;
     }
     this.setState(state);
   }
@@ -42,21 +51,20 @@ class App extends Component {
 
 
   render() {
-    const search = this.state.search.toLowerCase();
-    const movies = this.state.movies;
+    const password = this.state.password;
     const isFetching = this.state.isFetching;
+    const score = this.state.score;
 
     return (
-      <div>
-      <input style={isFetching ? {"backgroundColor":"#eee"} : {}} type="text" value={search} onChange={(e)=>this.change(e)}/>
-      <ul>
-        { movies.map((item) => (
-          <li>
-          {item.original_title}
-          </li>
-        ))}
-        </ul>
-        </div>
+      <html>
+        <body>
+          <input style={isFetching ? { "backgroundColor": "#eee" } : {}} type="text" value={password} onChange={(e) => this.change(e) }/>
+
+          Your password strength:
+          <progress value={score} max="100">
+          </progress>
+        </body>
+      </html>
     );
   }
 }
